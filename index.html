@@ -13,6 +13,8 @@
         a { color: #3498db; text-decoration: none; font-weight: bold; }
         a:hover { text-decoration: underline; }
         .btn-app { background-color: #3498db; color: white; padding: 12px 24px; border-radius: 5px; display: inline-block; text-decoration: none; font-weight: bold; }
+        ul#pdf-list { list-style-type: square; padding-left: 20px; }
+        ul#pdf-list li { margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -33,10 +35,42 @@
 
         <h2>Document & Resource Library (PDFs)</h2>
         <p>Access and read my uploaded research documents below:</p>
-        <ul>
-            <li><a href="English Vocabulary in Use.pdf" target="_blank">English Vocabulary in Use (PDF)</a></li>
-            <li><a href="The Let Them Theory..pdf" target="_blank">The Let Them Theory - Mel Robbins (PDF)</a></li>
+        <ul id="pdf-list">
+            <li>Loading documents...</li>
         </ul>
     </div>
+
+    <script>
+        const repoOwner = 'vireaksien168edu-lab';
+        const repoName = 'vireaksien168edu-lab.github.io';
+        
+        fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/`)
+            .then(response => response.json())
+            .then(data => {
+                const pdfList = document.getElementById('pdf-list');
+                pdfList.innerHTML = '';
+                
+                const pdfFiles = data.filter(file => file.name.toLowerCase().endsWith('.pdf'));
+                
+                if (pdfFiles.length === 0) {
+                    pdfList.innerHTML = '<li>No PDF documents found.</li>';
+                    return;
+                }
+                
+                pdfFiles.forEach(file => {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.href = file.name;
+                    a.target = '_blank';
+                    a.textContent = file.name.replace(/\.pdf$/i, '') + ' (PDF)';
+                    li.appendChild(a);
+                    pdfList.appendChild(li);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('pdf-list').innerHTML = '<li>Error loading document list.</li>';
+            });
+    </script>
 </body>
 </html>
